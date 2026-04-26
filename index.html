@@ -268,6 +268,10 @@
 
 <!-- ===== SCREEN: ORDER ===== -->
 <div class="screen" id="screenOrder">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
+    <span id="syncStatus" style="font-size:0.75rem;font-family:inherit;"></span>
+    <button onclick="loadFromGAS().then(refreshUI)" style="font-size:0.72rem;background:none;border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;color:var(--text-muted);">🔄 手動同步</button>
+  </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('meal1',this)">🍱 5/2（六）午餐</button>
     <button class="tab-btn" onclick="switchTab('meal2',this)">🥢 5/3（日）午餐</button>
@@ -480,25 +484,84 @@ function getQty() { return load('qty_' + currentUser, {}); }
 function saveQty(q) { save('qty_' + currentUser, q); }
 
 // ========== SYNC ==========
+let isSyncing = false;
+
+function setSyncStatus(status) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  if (status === 'syncing') { el.textContent = '⏳ 同步中…'; el.style.color = '#f39c12'; }
+  else if (status === 'ok') {
+    const now = new Date();
+    const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
+    el.textContent = '✅ 已同步 ' + t;
+    el.style.color = '#27ae60';
+  }
+  else { el.textContent = '⚠️ 同步失敗'; el.style.color = '#e74c3c'; }
+}
+
+async function loadFromGAS() {
+  try {
+    setSyncStatus('syncing');
+    const res = await fetch(GAS_URL + '?t=' + Date.now());
+    const data = await res.json();
+    if (data.meal1) save('meal1Orders', data.meal1);
+    if (data.meal2) save('meal2Orders', data.meal2);
+    if (data.names) save('names', data.names);
+    // restaurants: only sync name+note (not images)
+    if (data.restaurants) {
+      const local = load('restaurants', null);
+      const merged = data.restaurants.map((r, i) => ({
+        name: r.name,
+        note: r.note,
+        imgData: (local && local[i]) ? local[i].imgData : '',
+      }));
+      save('restaurants', merged);
+    }
+    setSyncStatus('ok');
+    return true;
+  } catch(e) {
+    setSyncStatus('fail');
+    return false;
+  }
+}
+
 function syncToSheet() {
   const names = getNames();
   const meal1 = getMeal1Orders();
   const meal2 = getMeal2Orders();
-  const restaurants = getRestaurants().map(r => r.name);
+  const restaurants = getRestaurants().map(r => ({ name: r.name, note: r.note }));
   fetch(GAS_URL, {
     method: 'POST', mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ names, meal1, meal2, restaurants })
-  }).catch(() => {});
+  }).then(() => {
+    setTimeout(() => { loadFromGAS().then(refreshUI); }, 1500);
+  }).catch(() => setSyncStatus('fail'));
+  setSyncStatus('syncing');
+}
+
+function refreshUI() {
+  populateNameSelect();
+  renderRestaurantsGrid();
+  renderMeal1Summary();
+  renderMeal2Summary();
 }
 
 // ========== INIT ==========
-function init() {
+async function init() {
   populateNameSelect();
   renderRestaurantsGrid();
   renderMenu();
   renderMeal1Summary();
   renderMeal2Summary();
+  // Load from GAS then refresh UI
+  const ok = await loadFromGAS();
+  if (ok) refreshUI();
+  // Poll every 30 seconds
+  setInterval(async () => {
+    const ok = await loadFromGAS();
+    if (ok) refreshUI();
+  }, 30000);
 }
 
 function populateNameSelect() {
