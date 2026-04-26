@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>點餐統計系統</title>
+<style>
+  :root {
+    --primary: #c0392b;
+    --primary-light: #e74c3c;
+    --primary-bg: #fdf2f2;
+    --accent: #f39c12;
+    --accent-bg: #fef9ec;
+    --green: #27ae60;
+    --green-bg: #eafaf1;
+    --bg: #faf8f5;
+    --card: #ffffff;
+    --border: #e8e0d5;
+    --text: #2c2416;
+    --text-muted: #8b7355;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Serif TC', 'Noto Sans TC', serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500&display=swap');
+
+  /* ===== HEADER ===== */
+  .site-header {
+    background: var(--primary);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  .site-header h1 { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+  .header-user { font-size: 0.85rem; opacity: 0.9; }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; padding: 1.5rem; max-width: 720px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  /* ===== LANDING ===== */
+  .landing-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    text-align: center;
+    margin-top: 2rem;
+  }
+  .landing-icon { font-size: 3rem; margin-bottom: 0.8rem; }
+  .landing-card h2 { font-size: 1.4rem; color: var(--primary); margin-bottom: 0.4rem; }
+  .landing-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; font-family: 'Noto Sans TC', sans-serif; }
+  .select-wrap { position: relative; margin-bottom: 1rem; }
+  .select-wrap select {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 2px solid var(--border); border-radius: var(--radius-sm);
+    font-size: 1rem; font-family: 'Noto Sans TC', sans-serif;
+    background: white; color: var(--text);
+    appearance: none; cursor: pointer;
+  }
+  .select-wrap::after {
+    content: '▾'; position: absolute; right: 1rem; top: 50%;
+    transform: translateY(-50%); color: var(--text-muted); pointer-events: none;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 0.7rem 1.4rem; border-radius: var(--radius-sm);
+    border: none; cursor: pointer; font-size: 0.95rem;
+    font-family: 'Noto Sans TC', sans-serif; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--primary); color: white; width: 100%; justify-content: center; }
+  .btn-primary:hover { background: var(--primary-light); }
+  .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--border); font-size: 0.85rem; }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-accent { background: var(--accent); color: white; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+  .admin-row { margin-top: 1rem; }
+
+  /* ===== TABS ===== */
+  .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 1.5rem; gap: 0; }
+  .tab-btn {
+    flex: 1; padding: 0.8rem; border: none; background: transparent;
+    font-size: 0.9rem; font-family: 'Noto Sans TC', sans-serif; cursor: pointer;
+    color: var(--text-muted); border-bottom: 3px solid transparent; margin-bottom: -2px;
+    transition: all 0.15s;
+  }
+  .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 500; }
+
+  /* ===== SECTION TITLES ===== */
+  .section-title {
+    font-size: 1rem; font-weight: 700; color: var(--primary);
+    margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ===== MEAL 1 (5/2) ===== */
+  .restaurants-grid { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+  .restaurant-card {
+    background: var(--card); border-radius: var(--radius);
+    border: 2px solid var(--border); padding: 1rem;
+    cursor: pointer; transition: all 0.15s; position: relative;
+  }
+  .restaurant-card.selected { border-color: var(--primary); background: var(--primary-bg); }
+  .restaurant-card input[type=radio] { position: absolute; opacity: 0; }
+  .restaurant-name { font-size: 1rem; font-weight: 500; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 8px; }
+  .restaurant-check {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--border); background: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .restaurant-card.selected .restaurant-check { background: var(--primary); border-color: var(--primary); }
+  .restaurant-check::after { content: '✓'; color: white; font-size: 0.7rem; display: none; }
+  .restaurant-card.selected .restaurant-check::after { display: block; }
+  .restaurant-note { font-size: 0.82rem; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; }
+  .restaurant-img { width: 100%; max-height: 200px; object-fit: contain; border-radius: 6px; margin-top: 0.6rem; background: #f5f5f0; }
+  .admin-edit-bar { display: flex; gap: 6px; margin-top: 0.6rem; padding-top: 0.6rem; border-top: 1px dashed var(--border); }
+  .restaurant-no-img { background: #f5f5f0; border-radius: 6px; padding: 1.5rem; text-align: center; color: var(--text-muted); font-size: 0.82rem; margin-top: 0.6rem; font-family: 'Noto Sans TC', sans-serif; }
+
+  /* ===== SUMMARY ===== */
+  .summary-box {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .summary-box h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.6rem; font-family: 'Noto Sans TC', sans-serif; }
+  .restaurant-group { margin-bottom: 0.8rem; }
+  .restaurant-group-name { font-weight: 500; color: var(--primary); font-size: 0.9rem; margin-bottom: 0.3rem; }
+  .people-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .person-tag {
+    background: var(--primary-bg); color: var(--primary);
+    border-radius: 20px; padding: 3px 10px; font-size: 0.78rem;
+    font-family: 'Noto Sans TC', sans-serif; border: 1px solid #f5c6c6;
+  }
+  .no-data { color: var(--text-muted); font-size: 0.85rem; font-family: 'Noto Sans TC', sans-serif; }
+
+  /* ===== MEAL 2 (5/3) ===== */
+  .menu-category { margin-bottom: 1.5rem; }
+  .category-title {
+    font-size: 0.82rem; font-weight: 700; letter-spacing: 1px;
+    color: var(--text-muted); text-transform: uppercase;
+    padding: 0.4rem 0; border-bottom: 1px solid var(--border);
+    margin-bottom: 0.8rem; font-family: 'Noto Sans TC', sans-serif;
+  }
+  .menu-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.6rem 0; border-bottom: 1px solid #f0ebe3;
+  }
+  .menu-item-name { flex: 1; font-size: 0.9rem; }
+  .menu-item-price { font-size: 0.8rem; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; min-width: 36px; }
+  .qty-control { display: flex; align-items: center; gap: 6px; }
+  .qty-btn {
+    width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border);
+    background: white; cursor: pointer; font-size: 1rem; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary); font-weight: 700; transition: all 0.12s;
+  }
+  .qty-btn:hover { background: var(--primary-bg); border-color: var(--primary); }
+  .qty-display { font-size: 0.95rem; font-weight: 500; min-width: 18px; text-align: center; }
+  .order-note-input {
+    width: 100%; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.6rem 0.8rem; font-size: 0.85rem; font-family: 'Noto Sans TC', sans-serif;
+    margin-top: 0.8rem; resize: vertical;
+  }
+  .order-summary-item { display: flex; justify-content: space-between; font-size: 0.88rem; padding: 0.3rem 0; font-family: 'Noto Sans TC', sans-serif; }
+  .order-total { font-weight: 700; color: var(--primary); border-top: 1px solid var(--border); margin-top: 0.4rem; padding-top: 0.4rem; }
+
+  /* ===== ORDER LIST ===== */
+  .order-person-card {
+    background: var(--card); border-radius: var(--radius-sm);
+    border: 1px solid var(--border); padding: 0.8rem 1rem; margin-bottom: 0.6rem;
+  }
+  .order-person-name { font-weight: 500; color: var(--primary); margin-bottom: 0.4rem; font-size: 0.9rem; }
+  .order-item-line { font-size: 0.82rem; color: var(--text-muted); font-family: 'Noto Sans TC', sans-serif; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 500;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: var(--radius); padding: 1.5rem;
+    max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;
+  }
+  .modal h3 { margin-bottom: 1rem; color: var(--primary); }
+  .modal input, .modal textarea {
+    width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    padding: 0.6rem 0.8rem; font-size: 0.9rem; font-family: 'Noto Sans TC', sans-serif;
+    margin-bottom: 0.6rem;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 0.8rem; }
+  .btn-cancel { background: #f0ebe3; color: var(--text-muted); }
+  .name-list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 0; border-bottom: 1px solid #f0ebe3; font-size: 0.88rem;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .name-edit-input { border: 1px solid var(--border); border-radius: 4px; padding: 3px 6px; font-size: 0.85rem; width: 120px; }
+
+  .badge { display: inline-block; border-radius: 20px; padding: 2px 10px; font-size: 0.75rem; font-family: 'Noto Sans TC', sans-serif; }
+  .badge-red { background: var(--primary-bg); color: var(--primary); border: 1px solid #f5c6c6; }
+
+  .submit-row { margin-top: 1.2rem; display: flex; gap: 8px; flex-direction: column; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 1.2rem 0; }
+  .live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; color: var(--green); font-family: 'Noto Sans TC', sans-serif; }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    background: #2c2416; color: white; padding: 0.7rem 1.4rem;
+    border-radius: 30px; font-size: 0.88rem; z-index: 1000;
+    font-family: 'Noto Sans TC', sans-serif; opacity: 0;
+    transition: opacity 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+
+  .export-btn { margin-top: 1rem; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="site-header">
+  <h1>🍱 點餐統計系統</h1>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span class="header-user" id="headerUser"></span>
+    <button class="btn btn-outline" style="color:white;border-color:rgba(255,255,255,0.4);font-size:0.78rem;padding:4px 10px;" onclick="goHome()">換人</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ========== SCREEN: LANDING ========== -->
+<div class="screen active" id="screenLanding">
+  <div class="landing-card">
+    <div class="landing-icon">🍜</div>
+    <h2>歡迎！請選擇您的名字</h2>
+    <p>選擇後進入點餐畫面，可為 5/2 午餐與 5/3 午餐分別登記</p>
+    <div class="select-wrap">
+      <select id="nameSelect">
+        <option value="">— 請選擇姓名 —</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="enterOrder()">進入點餐 →</button>
+    <div class="admin-row">
+      <button class="btn btn-outline" onclick="openAdminModal()">管理員設定 🔑</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SCREEN: ORDER ========== -->
+<div class="screen" id="screenOrder">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('meal1',this)">🍱 5/2（六）午餐</button>
+    <button class="tab-btn" onclick="switchTab('meal2',this)">🥢 5/3（日）午餐</button>
+  </div>
+
+  <!-- ===== MEAL 1 ===== -->
+  <div class="tab-content active" id="meal1">
+    <div class="section-title">📍 請選擇 5/2（六）午餐餐廳</div>
+    <div class="restaurants-grid" id="restaurantsGrid"></div>
+
+    <div class="submit-row">
+      <button class="btn btn-primary" onclick="submitMeal1()">確認送出 5/2 選擇</button>
+    </div>
+
+    <hr class="divider">
+    <div class="section-title">
+      📊 即時統計
+      <span class="live-badge"><span class="live-dot"></span>即時</span>
+    </div>
+    <div id="meal1Summary"></div>
+  </div>
+
+  <!-- ===== MEAL 2 ===== -->
+  <div class="tab-content" id="meal2">
+    <div class="section-title">🥢 5/3（日）午餐 — 素食越南料理</div>
+    <div id="menuGrid"></div>
+
+    <label style="font-size:0.85rem;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;display:block;margin-top:0.8rem;">備註（過敏、特殊需求等）</label>
+    <textarea class="order-note-input" id="meal2Note" rows="2" placeholder="如有備註請填寫…"></textarea>
+
+    <div class="submit-row">
+      <button class="btn btn-primary" onclick="submitMeal2()">確認送出 5/3 點餐</button>
+    </div>
+
+    <hr class="divider">
+    <div class="section-title">
+      📊 即時點餐總覽
+      <span class="live-badge"><span class="live-dot"></span>即時</span>
+    </div>
+    <div id="meal2Summary"></div>
+  </div>
+</div>
+
+<!-- ========== MODAL: ADMIN LOGIN ========== -->
+<div class="modal-overlay" id="modalAdmin">
+  <div class="modal">
+    <h3>🔑 管理員登入</h3>
+    <input type="password" id="adminPwInput" placeholder="請輸入密碼" onkeyup="if(event.key==='Enter')checkAdminPw()">
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal('modalAdmin')">取消</button>
+      <button class="btn btn-primary" onclick="checkAdminPw()">確認</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL: ADMIN PANEL ========== -->
+<div class="modal-overlay" id="modalAdminPanel">
+  <div class="modal" style="max-width:480px;">
+    <h3>⚙️ 管理員面板</h3>
+
+    <div style="font-size:0.88rem;font-weight:500;margin-bottom:0.5rem;font-family:'Noto Sans TC',sans-serif;">成員名單</div>
+    <div id="adminNameList"></div>
+    <div style="display:flex;gap:6px;margin-top:0.6rem;">
+      <input id="newNameInput" placeholder="新增姓名" style="flex:1;border:1.5px solid var(--border);border-radius:6px;padding:6px 10px;font-size:0.88rem;font-family:'Noto Sans TC',sans-serif;">
+      <button class="btn btn-green btn-sm" onclick="addName()">新增</button>
+    </div>
+
+    <hr class="divider">
+    <div style="font-size:0.88rem;font-weight:500;margin-bottom:0.5rem;font-family:'Noto Sans TC',sans-serif;">5/2 餐廳設定</div>
+    <div id="restaurantAdminList"></div>
+
+    <hr class="divider">
+    <div style="font-size:0.88rem;font-weight:500;margin-bottom:0.5rem;font-family:'Noto Sans TC',sans-serif;">匯出資料</div>
+    <button class="btn btn-accent btn-sm export-btn" onclick="exportCSV()">⬇ 下載 CSV（可貼入試算表）</button>
+
+    <div class="modal-actions" style="margin-top:1.2rem;">
+      <button class="btn btn-primary" onclick="closeModal('modalAdminPanel')">完成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MODAL: RESTAURANT EDIT ========== -->
+<div class="modal-overlay" id="modalRestEdit">
+  <div class="modal">
+    <h3 id="restEditTitle">編輯餐廳</h3>
+    <label style="font-size:0.82rem;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;">餐廳名稱</label>
+    <input id="restNameInput" placeholder="餐廳名稱">
+    <label style="font-size:0.82rem;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;">備註說明</label>
+    <textarea id="restNoteInput" rows="3" placeholder="菜單備註、特色說明等…" style="width:100%;border:1.5px solid var(--border);border-radius:8px;padding:6px 10px;font-size:0.88rem;font-family:'Noto Sans TC',sans-serif;resize:vertical;margin-bottom:0.6rem;"></textarea>
+    <label style="font-size:0.82rem;color:var(--text-muted);font-family:'Noto Sans TC',sans-serif;">上傳菜單圖片</label>
+    <input type="file" id="restImgInput" accept="image/*" style="margin-bottom:0.6rem;font-family:'Noto Sans TC',sans-serif;font-size:0.85rem;">
+    <div class="modal-actions">
+      <button class="btn btn-cancel" onclick="closeModal('modalRestEdit')">取消</button>
+      <button class="btn btn-primary" onclick="saveRestaurant()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ========== STATE ==========
+const ADMIN_PW = '0857';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwk7YAwP-HxX4dWC4yAlaOG4W-ogPXt71V44UNljklK-DPORgs7LuPjF9qRukkV5NLE/exec';
+let currentUser = '';
+let adminMode = false;
+let editingRestIdx = -1;
+
+const defaultNames = [
+  '曹皓涵','曹胤和','林瑋揚','游巧卉','林柏睿','呂林碧華',
+  '沈家正','呂佳玲','張雅絜','陳癸贏','許良瑋','康若婷',
+  '鄭雅云','楊妤柔','盧思妤','劉欣沛','邱琇鈺','郭育銘',
+  '俞家翔','蘇洛歆','蔡明育','蘇泓瑋','劉欣泰','德國朋友'
+];
+
+const menuData = [
+  {
+    category: '麵食類 Phở Chay',
+    items: [
+      { name: '素酸辣湯河粉', price: 95 },
+      { name: '湯米線', price: 95 },
+      { name: '湯河粉', price: 95 },
+      { name: '炒/乾河粉', price: 90 },
+      { name: '素咖哩米線', price: 90 },
+      { name: '素炒冬粉', price: 90 },
+      { name: '素炒泡麵', price: 90 },
+      { name: '素炒米粉', price: 90 },
+    ]
+  },
+  {
+    category: '飯類 Chay',
+    items: [
+      { name: '素燥飯', price: 50 },
+      { name: '素炒飯', price: 90 },
+      { name: '素酸辣飯', price: 95 },
+      { name: '素咖哩飯', price: 95 },
+      { name: '素便當', price: 95 },
+    ]
+  },
+  {
+    category: '湯類 Canh Chay',
+    items: [
+      { name: '泰國湯', price: 80 },
+      { name: '養生湯', price: 80 },
+    ]
+  },
+  {
+    category: '其他類 Chay',
+    items: [
+      { name: '煎餃', price: 80 },
+      { name: '素手工水餃（小）6顆', price: 60 },
+      { name: '素手工水餃（大）7顆', price: 70 },
+      { name: '素煎餅', price: 60 },
+      { name: '滴咖啡', price: 60 },
+      { name: '滷炸物（小）', price: 70 },
+      { name: '滷炸物（大）', price: 100 },
+      { name: '涼/炸春捲', price: 80 },
+      { name: '炒青菜', price: 80 },
+      { name: '泰國甜辣', price: 20 },
+    ]
+  }
+];
+
+// ========== STORAGE HELPERS ==========
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; }
+}
+function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+function getNames() { return load('names', defaultNames); }
+function saveNames(n) { save('names', n); }
+function getRestaurants() {
+  return load('restaurants', [
+    { name: '餐廳 A', note: '', imgData: '' },
+    { name: '餐廳 B', note: '', imgData: '' },
+    { name: '餐廳 C', note: '', imgData: '' },
+  ]);
+}
+function saveRestaurants(r) { save('restaurants', r); }
+function getMeal1Orders() { return load('meal1Orders', {}); }
+function saveMeal1Orders(o) { save('meal1Orders', o); }
+function getMeal2Orders() { return load('meal2Orders', {}); }
+function saveMeal2Orders(o) { save('meal2Orders', o); }
+function getQty() { return load('qty_' + currentUser, {}); }
+function saveQty(q) { save('qty_' + currentUser, q); }
+
+// ========== INIT ==========
+function init() {
+  populateNameSelect();
+  renderRestaurantsGrid();
+  renderMenu();
+  renderMeal1Summary();
+  renderMeal2Summary();
+}
+
+function populateNameSelect() {
+  const sel = document.getElementById('nameSelect');
+  const names = getNames();
+  sel.innerHTML = '<option value="">— 請選擇姓名 —</option>';
+  names.forEach(n => {
+    const opt = document.createElement('option');
+    opt.value = n; opt.textContent = n;
+    sel.appendChild(opt);
+  });
+}
+
+// ========== NAVIGATION ==========
+function enterOrder() {
+  const sel = document.getElementById('nameSelect').value;
+  if (!sel) { showToast('請先選擇您的名字 😊'); return; }
+  currentUser = sel;
+  document.getElementById('headerUser').textContent = sel;
+  showScreen('screenOrder');
+  renderRestaurantsGrid();
+  renderMenu();
+  renderMeal1Summary();
+  renderMeal2Summary();
+  // Restore user qty
+  const qty = getQty();
+  Object.keys(qty).forEach(k => {
+    const el = document.getElementById('qty_' + k);
+    if (el) el.textContent = qty[k];
+  });
+  // Restore meal1 selection
+  const meal1 = getMeal1Orders();
+  if (meal1[currentUser] !== undefined) {
+    const cards = document.querySelectorAll('.restaurant-card');
+    cards.forEach(c => { c.classList.remove('selected'); });
+    const target = document.querySelector(`.restaurant-card[data-idx="${meal1[currentUser]}"]`);
+    if (target) target.classList.add('selected');
+  }
+  // restore note
+  const meal2 = getMeal2Orders();
+  if (meal2[currentUser]) {
+    document.getElementById('meal2Note').value = meal2[currentUser].note || '';
+  }
+}
+
+function goHome() {
+  currentUser = '';
+  document.getElementById('headerUser').textContent = '';
+  showScreen('screenLanding');
+  populateNameSelect();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tab).classList.add('active');
+  if (tab === 'meal1') { renderMeal1Summary(); }
+  if (tab === 'meal2') { renderMeal2Summary(); }
+}
+
+// ========== RESTAURANTS ==========
+function renderRestaurantsGrid() {
+  const grid = document.getElementById('restaurantsGrid');
+  if (!grid) return;
+  const restaurants = getRestaurants();
+  const meal1 = getMeal1Orders();
+  const selected = meal1[currentUser];
+  grid.innerHTML = '';
+  restaurants.forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'restaurant-card' + (selected === i ? ' selected' : '');
+    card.dataset.idx = i;
+    card.onclick = () => selectRestaurant(i);
+    let imgHtml = r.imgData
+      ? `<img src="${r.imgData}" class="restaurant-img" alt="菜單">`
+      : `<div class="restaurant-no-img">📷 菜單圖片尚未上傳</div>`;
+    let adminBar = adminMode
+      ? `<div class="admin-edit-bar">
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();openRestEdit(${i})">✏️ 編輯</button>
+        </div>` : '';
+    card.innerHTML = `
+      <div class="restaurant-name">
+        <div class="restaurant-check"></div>
+        ${r.name}
+      </div>
+      ${r.note ? `<div class="restaurant-note">${r.note}</div>` : ''}
+      ${imgHtml}
+      ${adminBar}
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function selectRestaurant(idx) {
+  document.querySelectorAll('.restaurant-card').forEach(c => c.classList.remove('selected'));
+  document.querySelector(`.restaurant-card[data-idx="${idx}"]`).classList.add('selected');
+}
+
+// ========== SYNC TO GOOGLE SHEETS ==========
+function syncToSheet() {
+  const names = getNames();
+  const meal1 = getMeal1Orders();
+  const meal2 = getMeal2Orders();
+  const restaurants = getRestaurants().map(r => r.name);
+  const payload = { names, meal1, meal2, restaurants };
+  fetch(GAS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(() => {
+    showToast('✅ 已同步至 Google 試算表！');
+  }).catch(() => {
+    showToast('⚠️ 同步失敗，請檢查網路');
+  });
+}
+
+function submitMeal1() {
+  const selected = document.querySelector('.restaurant-card.selected');
+  if (!selected) { showToast('請先選擇一家餐廳 🍽️'); return; }
+  const idx = parseInt(selected.dataset.idx);
+  const orders = getMeal1Orders();
+  orders[currentUser] = idx;
+  saveMeal1Orders(orders);
+  renderMeal1Summary();
+  syncToSheet();
+  showToast('✅ 5/2 餐廳選擇已儲存，同步中…');
+}
+
+function renderMeal1Summary() {
+  const el = document.getElementById('meal1Summary');
+  if (!el) return;
+  const orders = getMeal1Orders();
+  const restaurants = getRestaurants();
+  const groups = {};
+  Object.entries(orders).forEach(([name, idx]) => {
+    const rname = restaurants[idx] ? restaurants[idx].name : '(已刪除)';
+    if (!groups[rname]) groups[rname] = [];
+    groups[rname].push(name);
+  });
+  if (Object.keys(groups).length === 0) {
+    el.innerHTML = '<div class="summary-box"><div class="no-data">尚無人登記 5/2 午餐</div></div>';
+    return;
+  }
+  let html = '<div class="summary-box">';
+  Object.entries(groups).forEach(([rname, people]) => {
+    html += `<div class="restaurant-group">
+      <div class="restaurant-group-name">🍴 ${rname}（${people.length} 人）</div>
+      <div class="people-list">`;
+    people.forEach(p => { html += `<span class="person-tag">${p}</span>`; });
+    html += '</div></div>';
+  });
+  html += '</div>';
+  el.innerHTML = html;
+}
+
+// ========== MENU ==========
+let qtyMap = {};
+
+function renderMenu() {
+  const grid = document.getElementById('menuGrid');
+  if (!grid) return;
+  qtyMap = getQty();
+  let html = '';
+  menuData.forEach(cat => {
+    html += `<div class="menu-category">
+      <div class="category-title">${cat.category}</div>`;
+    cat.items.forEach(item => {
+      const key = item.name;
+      const qty = qtyMap[key] || 0;
+      html += `<div class="menu-item">
+        <div class="menu-item-name">${item.name}</div>
+        <div class="menu-item-price">$${item.price}</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty('${key}',-1,${item.price})">−</button>
+          <div class="qty-display" id="qty_${key}">${qty}</div>
+          <button class="qty-btn" onclick="changeQty('${key}',1,${item.price})">＋</button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+}
+
+function changeQty(key, delta, price) {
+  if (!qtyMap[key]) qtyMap[key] = 0;
+  qtyMap[key] = Math.max(0, qtyMap[key] + delta);
+  const el = document.getElementById('qty_' + key);
+  if (el) el.textContent = qtyMap[key];
+  saveQty(qtyMap);
+}
+
+function submitMeal2() {
+  const hasOrder = Object.values(qtyMap).some(v => v > 0);
+  if (!hasOrder) { showToast('請先選擇至少一道餐點 🥢'); return; }
+  const note = document.getElementById('meal2Note').value;
+  const orders = getMeal2Orders();
+  const items = [];
+  menuData.forEach(cat => {
+    cat.items.forEach(item => {
+      const q = qtyMap[item.name] || 0;
+      if (q > 0) items.push({ name: item.name, qty: q, price: item.price });
+    });
+  });
+  orders[currentUser] = { items, note };
+  saveMeal2Orders(orders);
+  renderMeal2Summary();
+  syncToSheet();
+  showToast('✅ 5/3 點餐已儲存，同步中…');
+}
+
+function renderMeal2Summary() {
+  const el = document.getElementById('meal2Summary');
+  if (!el) return;
+  const orders = getMeal2Orders();
+  if (Object.keys(orders).length === 0) {
+    el.innerHTML = '<div class="summary-box"><div class="no-data">尚無人登記 5/3 午餐</div></div>';
+    return;
+  }
+  let html = '';
+  Object.entries(orders).forEach(([name, order]) => {
+    const total = order.items.reduce((s, i) => s + i.price * i.qty, 0);
+    html += `<div class="order-person-card">
+      <div class="order-person-name">${name}</div>`;
+    order.items.forEach(i => {
+      html += `<div class="order-item-line">• ${i.name} × ${i.qty}　$${i.price * i.qty}</div>`;
+    });
+    if (order.note) html += `<div class="order-item-line" style="color:var(--accent);margin-top:3px;">📝 ${order.note}</div>`;
+    html += `<div class="order-item-line" style="font-weight:500;color:var(--primary);margin-top:4px;">合計 $${total}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+// ========== ADMIN ==========
+function openAdminModal() {
+  adminMode = false;
+  document.getElementById('adminPwInput').value = '';
+  openModal('modalAdmin');
+}
+
+function checkAdminPw() {
+  const pw = document.getElementById('adminPwInput').value;
+  if (pw === ADMIN_PW) {
+    closeModal('modalAdmin');
+    adminMode = true;
+    openAdminPanel();
+  } else {
+    showToast('密碼錯誤 ❌');
+  }
+}
+
+function openAdminPanel() {
+  renderAdminNameList();
+  renderRestaurantAdminList();
+  openModal('modalAdminPanel');
+}
+
+function renderAdminNameList() {
+  const names = getNames();
+  let html = '';
+  names.forEach((n, i) => {
+    html += `<div class="name-list-item">
+      <input class="name-edit-input" id="nameEdit_${i}" value="${n}">
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-green btn-sm" onclick="saveName(${i})">儲存</button>
+        <button class="btn btn-cancel btn-sm" onclick="deleteName(${i})">刪除</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('adminNameList').innerHTML = html;
+}
+
+function saveName(i) {
+  const names = getNames();
+  const val = document.getElementById('nameEdit_' + i).value.trim();
+  if (!val) return;
+  names[i] = val;
+  saveNames(names);
+  populateNameSelect();
+  renderAdminNameList();
+  showToast('名字已更新 ✅');
+}
+
+function deleteName(i) {
+  const names = getNames();
+  names.splice(i, 1);
+  saveNames(names);
+  populateNameSelect();
+  renderAdminNameList();
+  showToast('已刪除 ✅');
+}
+
+function addName() {
+  const val = document.getElementById('newNameInput').value.trim();
+  if (!val) return;
+  const names = getNames();
+  names.push(val);
+  saveNames(names);
+  populateNameSelect();
+  renderAdminNameList();
+  document.getElementById('newNameInput').value = '';
+  showToast('已新增 ✅');
+}
+
+function renderRestaurantAdminList() {
+  const restaurants = getRestaurants();
+  let html = '';
+  restaurants.forEach((r, i) => {
+    html += `<div class="name-list-item">
+      <span>${r.name}</span>
+      <button class="btn btn-outline btn-sm" onclick="openRestEdit(${i})">✏️ 編輯</button>
+    </div>`;
+  });
+  document.getElementById('restaurantAdminList').innerHTML = html;
+}
+
+function openRestEdit(idx) {
+  editingRestIdx = idx;
+  const r = getRestaurants()[idx];
+  document.getElementById('restEditTitle').textContent = '編輯 ' + r.name;
+  document.getElementById('restNameInput').value = r.name;
+  document.getElementById('restNoteInput').value = r.note || '';
+  document.getElementById('restImgInput').value = '';
+  openModal('modalRestEdit');
+}
+
+function saveRestaurant() {
+  const restaurants = getRestaurants();
+  const name = document.getElementById('restNameInput').value.trim();
+  const note = document.getElementById('restNoteInput').value.trim();
+  const file = document.getElementById('restImgInput').files[0];
+
+  function doSave(imgData) {
+    restaurants[editingRestIdx].name = name || restaurants[editingRestIdx].name;
+    restaurants[editingRestIdx].note = note;
+    if (imgData) restaurants[editingRestIdx].imgData = imgData;
+    saveRestaurants(restaurants);
+    renderRestaurantsGrid();
+    renderRestaurantAdminList();
+    closeModal('modalRestEdit');
+    showToast('餐廳資料已更新 ✅');
+  }
+
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => doSave(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    doSave(null);
+  }
+}
+
+// ========== EXPORT CSV ==========
+function exportCSV() {
+  const meal1 = getMeal1Orders();
+  const meal2 = getMeal2Orders();
+  const restaurants = getRestaurants();
+  const names = getNames();
+
+  let rows = [['姓名', '5/2 午餐選擇', '5/3 點餐明細', '5/3 備註', '5/3 合計']];
+  names.forEach(name => {
+    const r1idx = meal1[name];
+    const r1 = r1idx !== undefined ? restaurants[r1idx]?.name || '' : '';
+    const o2 = meal2[name];
+    const detail = o2 ? o2.items.map(i => `${i.name}×${i.qty}`).join('、') : '';
+    const note2 = o2 ? (o2.note || '') : '';
+    const total2 = o2 ? o2.items.reduce((s, i) => s + i.price * i.qty, 0) : '';
+    rows.push([name, r1, detail, note2, total2]);
+  });
+
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n');
+  const bom = '\uFEFF';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = '點餐統計.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  showToast('CSV 已下載，可貼入 Google 試算表 ✅');
+}
+
+// ========== MODAL HELPERS ==========
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ========== TOAST ==========
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ========== START ==========
+init();
+</script>
+</body>
+</html>
