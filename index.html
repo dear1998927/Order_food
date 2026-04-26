@@ -816,31 +816,37 @@ function renderMenu() {
   if (!grid) return;
   qtyMap = getQty();
   let html = '';
+  let idx = 0;
   menuData.forEach(cat => {
     html += `<div class="menu-category"><div class="category-title">${cat.category}</div>`;
     cat.items.forEach(item => {
       const qty = qtyMap[item.name] || 0;
       html += `<div class="menu-item">
         <div class="menu-item-name">${item.name}</div>
-        <div class="menu-item-price">${item.price}</div>
+        <div class="menu-item-price">${item.price}元</div>
         <div class="qty-control">
-          <button class="qty-btn" onclick="changeQty('${item.name}',-1)">−</button>
-          <div class="qty-display" id="qty_${item.name.replace(/[^a-zA-Z0-9]/g,'_')}">${qty}</div>
-          <button class="qty-btn" onclick="changeQty('${item.name}',1)">＋</button>
+          <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+          <div class="qty-display" id="qty_${idx}">${qty}</div>
+          <button class="qty-btn" onclick="changeQty(${idx},1)">＋</button>
         </div>
       </div>`;
+      idx++;
     });
     html += '</div>';
   });
   grid.innerHTML = html;
 }
 
-function changeQty(key, delta) {
-  if (!qtyMap[key]) qtyMap[key] = 0;
-  qtyMap[key] = Math.max(0, qtyMap[key] + delta);
-  const safeKey = key.replace(/[^a-zA-Z0-9]/g,'_');
-  const el = document.getElementById('qty_' + safeKey);
-  if (el) el.textContent = qtyMap[key];
+// Flat list of all items for index lookup
+const allMenuItems = menuData.flatMap(cat => cat.items);
+
+function changeQty(idx, delta) {
+  const item = allMenuItems[idx];
+  if (!item) return;
+  if (!qtyMap[item.name]) qtyMap[item.name] = 0;
+  qtyMap[item.name] = Math.max(0, qtyMap[item.name] + delta);
+  const el = document.getElementById('qty_' + idx);
+  if (el) el.textContent = qtyMap[item.name];
   saveQty(qtyMap);
 }
 
