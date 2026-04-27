@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>點餐統計系統</title>
+<title>點餐統計系統 | Meal Order System</title>
 <style>
   :root {
     --primary: #c0392b;
@@ -233,18 +233,18 @@
 
 <!-- HEADER -->
 <div class="site-header">
-  <h1>🍱 點餐統計系統</h1>
+  <h1>🍱 點餐統計系統 <span style="font-size:0.75rem;opacity:0.85;font-weight:400;">Meal Order System</span></h1>
   <div class="header-right">
     <span class="header-user" id="headerUser"></span>
-    <button class="btn-header" id="orderAdminBtn" style="display:none;" onclick="openOrderAdminModal()">管理員 🔑</button>
-    <button class="btn-header" id="backBtn" style="display:none;" onclick="goHome()">換人</button>
+    <button class="btn-header" id="orderAdminBtn" style="display:none;" onclick="openOrderAdminModal()">管理員 🔑 <span style="font-size:0.7rem;opacity:0.85;">Admin</span></button>
+    <button class="btn-header" id="backBtn" style="display:none;" onclick="goHome()">換人 <span style="font-size:0.7rem;opacity:0.85;">Switch</span></button>
   </div>
 </div>
 
 <!-- ADMIN BANNER (shown in order screen when admin logged in) -->
 <div class="admin-banner" id="adminBanner" style="display:none;">
-  ⚙️ 管理員模式：可刪除訂單、編輯餐廳
-  <button class="btn btn-sm btn-danger" onclick="exitAdminMode()">離開管理</button>
+  ⚙️ 管理員模式：可刪除訂單、編輯餐廳 <span style="font-size:0.78rem;opacity:0.8;">| Admin Mode: delete orders & edit restaurants</span>
+  <button class="btn btn-sm btn-danger" onclick="exitAdminMode()">離開管理 <span style="font-size:0.7rem;">Exit</span></button>
 </div>
 
 <!-- TOAST -->
@@ -254,29 +254,27 @@
 <div class="modal-overlay open" id="modalWelcome" style="align-items:center;">
   <div class="modal" style="max-width:460px;">
     <div style="text-align:center;font-size:2rem;margin-bottom:0.5rem;">🍱</div>
-    <h3 style="text-align:center;font-size:1.05rem;margin-bottom:1rem;">登入後請選擇 5/2 餐廳、5/3 餐點</h3>
+    <h3 style="text-align:center;font-size:1.05rem;margin-bottom:1rem;">登入後請選擇 5/2 餐廳、5/3 餐點<br><span style="font-size:0.82rem;font-weight:400;color:var(--text-muted);">After logging in, please select a restaurant for 5/2 and your meal for 5/3</span></h3>
 
     <div style="background:#fff8ec;border:1px solid #f5c97a;border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.9rem;font-size:0.85rem;color:#7a5200;font-weight:500;text-align:center;">
-      ⚠️ 這兩天的午餐皆為「自費」，不包含在團費內
+      ⚠️ 這兩天的午餐皆為「自費」，不包含在團費內<br><span style="font-size:0.8rem;">Both lunches are <strong>self-paid</strong> and not included in the group fee.</span>
     </div>
 
     <div style="margin-bottom:0.9rem;">
-      <div style="font-weight:600;color:var(--primary);margin-bottom:0.3rem;font-size:0.9rem;">🍴 5/2（六）選餐廳</div>
+      <div style="font-weight:600;color:var(--primary);margin-bottom:0.3rem;font-size:0.9rem;">🍴 5/2（六）選餐廳 <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);">Sat. 5/2 – Choose a Restaurant</span></div>
       <div style="font-size:0.84rem;color:var(--text);line-height:1.7;">
-        因店面較小，無法容納全部人，因此分成三家。<br>
-        （都在同一條路上，行程還是會一起行動）<br>
-        餐點直接到現場點餐即可，這邊只是先統計人數、避免同一家店過於熱門導致沒有座位，因此開個統計來做分流。
+        因店面較小，無法容納全部人，因此分成三家。<br>（都在同一條路上，行程還是都會一起行動）<br>餐點直接到現場點餐即可，這邊只是先統計人數、避免同一家店過於熱門導致沒有座位，因此開個統計來做分流。<br><br><span style="color:var(--text-muted);">Due to limited seating, guests are split across 3 nearby restaurants on the same street — we'll still move together as a group. You'll order food on-site; this is just to balance the headcount.</span>
       </div>
     </div>
 
     <div style="margin-bottom:1.2rem;">
-      <div style="font-weight:600;color:var(--primary);margin-bottom:0.3rem;font-size:0.9rem;">🥢 5/3（日）選餐點</div>
+      <div style="font-weight:600;color:var(--primary);margin-bottom:0.3rem;font-size:0.9rem;">🥢 5/3（日）選餐點 <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);">Sun. 5/3 – Choose Your Meal</span></div>
       <div style="font-size:0.84rem;color:var(--text);line-height:1.7;">
-        請根據自己的喜好、肚子容量、口袋深度來決定自己的餐點。
+        請根據自己的喜好、肚子容量、口袋深度來決定自己的餐點。<br><span style="color:var(--text-muted);">Choose based on your taste, appetite, and budget.</span>
       </div>
     </div>
 
-    <button class="btn btn-primary" onclick="closeModal('modalWelcome')">我知道了，開始點餐 →</button>
+    <button class="btn btn-primary" onclick="closeModal('modalWelcome')">我知道了，開始點餐 →  Got it, let's order!</button>
   </div>
 </div>
 
@@ -284,15 +282,15 @@
 <div class="screen active" id="screenLanding">
   <div class="landing-card">
     <div class="landing-icon">🍜</div>
-    <h2>歡迎！請選擇您的名字</h2>
-    <p>選擇後進入點餐畫面，可為 5/2 午餐與 5/3 午餐分別登記</p>
+    <h2>歡迎！請選擇您的名字</h2><p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.1rem;">Welcome! Please select your name</p>
+    <p>選擇後進入點餐畫面，可為 5/2 午餐與 5/3 午餐分別登記<br><span style="font-size:0.8rem;">Select your name to enter the ordering page for 5/2 &amp; 5/3 lunch.</span></p>
     <div class="select-wrap">
       <select id="nameSelect">
         <option value="">— 請選擇姓名 —</option>
       </select>
     </div>
-    <button class="btn btn-primary" onclick="enterOrder()">進入點餐 →</button>
-    <button class="btn btn-outline" onclick="openLandingAdminModal()">管理員設定 🔑</button>
+    <button class="btn btn-primary" onclick="enterOrder()">進入點餐 → Enter</button>
+    <button class="btn btn-outline" onclick="openLandingAdminModal()">管理員設定 🔑 Admin Settings</button>
   </div>
 </div>
 
@@ -300,41 +298,39 @@
 <div class="screen" id="screenOrder">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.4rem;">
     <span id="syncStatus" style="font-size:0.75rem;font-family:inherit;"></span>
-    <button onclick="loadFromGAS().then(refreshUI)" style="font-size:0.72rem;background:none;border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;color:var(--text-muted);">🔄 手動同步</button>
+    <button onclick="loadFromGAS().then(refreshUI)" style="font-size:0.72rem;background:none;border:1px solid var(--border);border-radius:5px;padding:2px 8px;cursor:pointer;color:var(--text-muted);">🔄 手動同步 Sync</button>
   </div>
   <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('meal1',this)">🍱 5/2（六）午餐</button>
-    <button class="tab-btn" onclick="switchTab('meal2',this)">🥢 5/3（日）午餐</button>
+    <button class="tab-btn active" onclick="switchTab('meal1',this)">🍱 5/2（六）午餐<br><span style="font-size:0.7rem;">Sat. Lunch</span></button>
+    <button class="tab-btn" onclick="switchTab('meal2',this)">🥢 5/3（日）午餐<br><span style="font-size:0.7rem;">Sun. Lunch</span></button>
   </div>
 
   <!-- MEAL 1 -->
   <div class="tab-content active" id="meal1">
-    <div class="section-title">📍 請選擇 5/2（六）午餐餐廳</div>
+    <div class="section-title">📍 請選擇 5/2（六）午餐餐廳 <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);">Select a restaurant for Sat. 5/2 lunch</span></div>
     <div class="restaurants-grid" id="restaurantsGrid"></div>
     <div class="submit-row">
-      <button class="btn btn-primary" onclick="submitMeal1()">確認送出 5/2 選擇</button>
+      <button class="btn btn-primary" onclick="submitMeal1()">確認送出 5/2 選擇 Confirm</button>
     </div>
     <hr class="divider">
     <div class="section-title">
-      📊 即時統計
-      <span class="live-badge"><span class="live-dot"></span>即時</span>
+      📊 即時統計 Live Stats <span class="live-badge"><span class="live-dot"></span>即時 Live</span>
     </div>
     <div id="meal1Summary"></div>
   </div>
 
   <!-- MEAL 2 -->
   <div class="tab-content" id="meal2">
-    <div class="section-title">🥢 5/3（日）午餐 — 素食越南料理</div>
+    <div class="section-title">🥢 5/3（日）午餐 — 素食越南料理 <span style="font-size:0.78rem;font-weight:400;color:var(--text-muted);">Sun. 5/3 Lunch – Vegetarian Vietnamese</span></div>
     <div id="menuGrid"></div>
-    <label class="section-label" style="margin-top:0.8rem;">備註（過敏、特殊需求等）</label>
-    <textarea class="order-note-input" id="meal2Note" rows="2" placeholder="如有備註請填寫…"></textarea>
+    <label class="section-label" style="margin-top:0.8rem;">備註（過敏、特殊需求等）<br><span style="font-size:0.78rem;color:var(--text-muted);">Notes (allergies, special requests, etc.)</span></label>
+    <textarea class="order-note-input" id="meal2Note" rows="2" placeholder="如有備註請填寫… / Notes here…"></textarea>
     <div class="submit-row">
-      <button class="btn btn-primary" onclick="submitMeal2()">確認送出 5/3 點餐</button>
+      <button class="btn btn-primary" onclick="submitMeal2()">確認送出 5/3 點餐 Confirm</button>
     </div>
     <hr class="divider">
     <div class="section-title">
-      📊 即時點餐總覽
-      <span class="live-badge"><span class="live-dot"></span>即時</span>
+      📊 即時點餐總覽 Live Orders <span class="live-badge"><span class="live-dot"></span>即時 Live</span>
     </div>
     <div id="meal2Summary"></div>
   </div>
@@ -343,11 +339,11 @@
 <!-- ===== MODAL: 登入畫面管理員（名單管理） ===== -->
 <div class="modal-overlay" id="modalLandingAdmin">
   <div class="modal">
-    <h3>🔑 管理員登入</h3>
-    <input type="password" id="landingAdminPw" placeholder="請輸入密碼" onkeyup="if(event.key==='Enter')checkLandingAdminPw()">
+    <h3>🔑 管理員登入 Admin Login</h3>
+    <input type="password" id="landingAdminPw" placeholder="請輸入密碼 Enter password" onkeyup="if(event.key==='Enter')checkLandingAdminPw()">
     <div class="modal-actions">
-      <button class="btn btn-cancel btn-sm" onclick="closeModal('modalLandingAdmin')">取消</button>
-      <button class="btn btn-primary btn-sm" onclick="checkLandingAdminPw()">確認</button>
+      <button class="btn btn-cancel btn-sm" onclick="closeModal('modalLandingAdmin')">取消 Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="checkLandingAdminPw()">確認 Confirm</button>
     </div>
   </div>
 </div>
@@ -355,14 +351,14 @@
 <!-- ===== MODAL: 登入畫面管理員面板（名單管理） ===== -->
 <div class="modal-overlay" id="modalNamePanel">
   <div class="modal" style="max-width:460px;">
-    <h3>👥 成員名單管理</h3>
+    <h3>👥 成員名單管理 Member List</h3>
     <div id="adminNameList"></div>
     <div style="display:flex;gap:6px;margin-top:0.6rem;">
-      <input id="newNameInput" placeholder="新增姓名" style="flex:1;">
-      <button class="btn btn-green btn-sm" onclick="addName()">新增</button>
+      <input id="newNameInput" placeholder="新增姓名 Add name" style="flex:1;">
+      <button class="btn btn-green btn-sm" onclick="addName()">新增 Add</button>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-primary btn-sm" onclick="closeModal('modalNamePanel')">完成</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('modalNamePanel')">完成 Done</button>
     </div>
   </div>
 </div>
@@ -370,11 +366,11 @@
 <!-- ===== MODAL: 點餐畫面管理員登入 ===== -->
 <div class="modal-overlay" id="modalOrderAdmin">
   <div class="modal">
-    <h3>🔑 管理員登入</h3>
-    <input type="password" id="orderAdminPw" placeholder="請輸入密碼" onkeyup="if(event.key==='Enter')checkOrderAdminPw()">
+    <h3>🔑 管理員登入 Admin Login</h3>
+    <input type="password" id="orderAdminPw" placeholder="請輸入密碼 Enter password" onkeyup="if(event.key==='Enter')checkOrderAdminPw()">
     <div class="modal-actions">
-      <button class="btn btn-cancel btn-sm" onclick="closeModal('modalOrderAdmin')">取消</button>
-      <button class="btn btn-primary btn-sm" onclick="checkOrderAdminPw()">確認</button>
+      <button class="btn btn-cancel btn-sm" onclick="closeModal('modalOrderAdmin')">取消 Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="checkOrderAdminPw()">確認 Confirm</button>
     </div>
   </div>
 </div>
@@ -382,24 +378,24 @@
 <!-- ===== MODAL: 點餐畫面管理員面板（訂單+餐廳管理） ===== -->
 <div class="modal-overlay" id="modalOrderPanel">
   <div class="modal" style="max-width:460px;">
-    <h3>⚙️ 訂單管理</h3>
+    <h3>⚙️ 訂單管理 Order Management</h3>
 
-    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem;">🍱 5/2 午餐訂單</div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem;">🍱 5/2 午餐訂單 5/2 Lunch Orders</div>
     <div id="adminMeal1Orders"></div>
 
     <hr class="divider">
-    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem;">🥢 5/3 午餐訂單</div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem;">🥢 5/3 午餐訂單 5/3 Lunch Orders</div>
     <div id="adminMeal2Orders"></div>
 
     <hr class="divider">
-    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem;">🏪 5/2 餐廳設定</div>
+    <div style="font-size:0.85rem;font-weight:600;color:var(--primary);margin-bottom:0.5rem;">🏪 5/2 餐廳設定 Restaurant Settings</div>
     <div id="restaurantAdminList"></div>
 
     <hr class="divider">
-    <button class="btn btn-accent btn-sm" onclick="exportCSV()">⬇ 下載 CSV（可貼入試算表）</button>
+    <button class="btn btn-accent btn-sm" onclick="exportCSV()">⬇ 下載 CSV（可貼入試算表）Download CSV</button>
 
     <div class="modal-actions">
-      <button class="btn btn-primary btn-sm" onclick="closeModal('modalOrderPanel')">完成</button>
+      <button class="btn btn-primary btn-sm" onclick="closeModal('modalOrderPanel')">完成 Done</button>
     </div>
   </div>
 </div>
@@ -407,16 +403,16 @@
 <!-- ===== MODAL: 餐廳編輯 ===== -->
 <div class="modal-overlay" id="modalRestEdit">
   <div class="modal">
-    <h3 id="restEditTitle">編輯餐廳</h3>
-    <label class="section-label">餐廳名稱</label>
-    <input id="restNameInput" placeholder="餐廳名稱">
-    <label class="section-label">備註說明</label>
-    <textarea id="restNoteInput" rows="3" placeholder="菜單備註、特色說明等…" style="resize:vertical;"></textarea>
-    <label class="section-label">上傳菜單圖片</label>
+    <h3 id="restEditTitle">編輯餐廳 Edit Restaurant</h3>
+    <label class="section-label">餐廳名稱 Restaurant Name</label>
+    <input id="restNameInput" placeholder="餐廳名稱 Restaurant name">
+    <label class="section-label">備註說明 Notes</label>
+    <textarea id="restNoteInput" rows="3" placeholder="菜單備註、特色說明等… Menu notes, description…" style="resize:vertical;"></textarea>
+    <label class="section-label">上傳菜單圖片 Upload Menu Image</label>
     <input type="file" id="restImgInput" accept="image/*" style="font-size:0.85rem;margin-bottom:0.5rem;">
     <div class="modal-actions">
-      <button class="btn btn-cancel btn-sm" onclick="closeModal('modalRestEdit')">取消</button>
-      <button class="btn btn-primary btn-sm" onclick="saveRestaurant()">儲存</button>
+      <button class="btn btn-cancel btn-sm" onclick="closeModal('modalRestEdit')">取消 Cancel</button>
+      <button class="btn btn-primary btn-sm" onclick="saveRestaurant()">儲存 Save</button>
     </div>
   </div>
 </div>
@@ -446,38 +442,38 @@ const defaultNames = [
 ];
 
 const menuData = [
-  { category: '麵食類 Phở Chay', items: [
-    { name: '素酸辣湯河粉', price: 95 },
-    { name: '湯米線', price: 95 },
-    { name: '湯河粉', price: 95 },
-    { name: '炒/乾河粉', price: 90 },
-    { name: '素咖哩米線', price: 90 },
-    { name: '素炒冬粉', price: 90 },
-    { name: '素炒泡麵', price: 90 },
-    { name: '素炒米粉', price: 90 },
+  { category: '麵食類 Phở Chay (Noodles)', items: [
+    { name: '素酸辣湯河粉 Spicy & Sour Rice Noodle Soup', price: 95 },
+    { name: '湯米線 Rice Vermicelli Soup', price: 95 },
+    { name: '湯河粉 Pho (Rice Noodle Soup)', price: 95 },
+    { name: '炒/乾河粉 Stir-fried / Dry Pho', price: 90 },
+    { name: '素咖哩米線 Curry Rice Vermicelli', price: 90 },
+    { name: '素炒冬粉 Stir-fried Glass Noodles', price: 90 },
+    { name: '素炒泡麵 Stir-fried Instant Noodles', price: 90 },
+    { name: '素炒米粉 Stir-fried Rice Noodles', price: 90 },
   ]},
-  { category: '飯類 Chay', items: [
-    { name: '素燥飯', price: 50 },
-    { name: '素炒飯', price: 90 },
-    { name: '素酸辣飯', price: 95 },
-    { name: '素咖哩飯', price: 95 },
-    { name: '素便當', price: 95 },
+  { category: '飯類 Chay (Rice)', items: [
+    { name: '素燥飯 Braised Topping Rice', price: 50 },
+    { name: '素炒飯 Fried Rice', price: 90 },
+    { name: '素酸辣飯 Spicy & Sour Rice', price: 95 },
+    { name: '素咖哩飯 Curry Rice', price: 95 },
+    { name: '素便當 Bento Box', price: 95 },
   ]},
-  { category: '湯類 Canh Chay', items: [
-    { name: '泰國湯', price: 80 },
-    { name: '養生湯', price: 80 },
+  { category: '湯類 Canh Chay (Soup)', items: [
+    { name: '泰國湯 Thai Soup', price: 80 },
+    { name: '養生湯 Herbal Health Soup', price: 80 },
   ]},
-  { category: '其他類 Chay', items: [
-    { name: '煎餃', price: 80 },
-    { name: '素手工水餃（小）6元/顆', price: 6 },
-    { name: '素手工水餃（大）7元/顆', price: 7 },
-    { name: '素煎餅', price: 60 },
-    { name: '滴咖啡', price: 60 },
-    { name: '滷炸物（小）', price: 70 },
-    { name: '滷炸物（大）', price: 100 },
-    { name: '涼/炸春捲', price: 80 },
-    { name: '炒青菜', price: 80 },
-    { name: '泰國甜辣', price: 20 },
+  { category: '其他類 Chay (Others)', items: [
+    { name: '煎餃 Pan-fried Dumplings', price: 80 },
+    { name: '素手工水餃（小）6元/顆 Handmade Dumplings S (6/pc)', price: 6 },
+    { name: '素手工水餃（大）7元/顆 Handmade Dumplings L (7/pc)', price: 7 },
+    { name: '素煎餅 Veggie Pancake', price: 60 },
+    { name: '滴咖啡 Drip Coffee', price: 60 },
+    { name: '滷炸物（小）Braised Fried Items S', price: 70 },
+    { name: '滷炸物（大）Braised Fried Items L', price: 100 },
+    { name: '涼/炸春捲 Fresh / Fried Spring Roll', price: 80 },
+    { name: '炒青菜 Stir-fried Vegetables', price: 80 },
+    { name: '泰國甜辣 Thai Sweet Chili Sauce', price: 20 },
   ]},
 ];
 
@@ -488,15 +484,24 @@ function load(key, def) {
 function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 function getNames() { return load('names', defaultNames); }
 function saveNames(n) { save('names', n); }
+// ========== VERSION (更新圖片時請改這個數字) ==========
+const RESTAURANT_VER = '20250427';
+
 function getRestaurants() {
   const defaults = [
     { name: '福圓素食', note: '只有自助餐　座位約10人左右', imgData: IMG0 },
     { name: '天佑素食', note: '中式早午餐類型　座位約5~6人', imgData: IMG1 },
     { name: '清原素食', note: '中式早午餐類型　座位約6~8位左右', imgData: IMG2 },
   ];
+  // 版本不同就清掉舊快取，強制用新圖片
+  const savedVer = localStorage.getItem('restaurantVer');
+  if (savedVer !== RESTAURANT_VER) {
+    localStorage.removeItem('restaurants');
+    localStorage.setItem('restaurantVer', RESTAURANT_VER);
+    return defaults;
+  }
   const saved = load('restaurants', null);
   if (!saved) return defaults;
-  // 名稱與備註永遠以程式碼為準，只保留 localStorage 中管理員上傳的圖片
   return defaults.map((def, i) => {
     const s = saved[i] || {};
     return {
@@ -520,14 +525,14 @@ let isSyncing = false;
 function setSyncStatus(status) {
   const el = document.getElementById('syncStatus');
   if (!el) return;
-  if (status === 'syncing') { el.textContent = '⏳ 同步中…'; el.style.color = '#f39c12'; }
+  if (status === 'syncing') { el.textContent = '⏳ 同步中… Syncing…'; el.style.color = '#f39c12'; }
   else if (status === 'ok') {
     const now = new Date();
     const t = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0') + ':' + now.getSeconds().toString().padStart(2,'0');
     el.textContent = '✅ 已同步 ' + t;
     el.style.color = '#27ae60';
   }
-  else { el.textContent = '⚠️ 同步失敗'; el.style.color = '#e74c3c'; }
+  else { el.textContent = '⚠️ 同步失敗 Sync failed'; el.style.color = '#e74c3c'; }
 }
 
 async function loadFromGAS() {
@@ -609,7 +614,7 @@ function populateNameSelect() {
 // ========== NAVIGATION ==========
 function enterOrder() {
   const sel = document.getElementById('nameSelect').value;
-  if (!sel) { showToast('請先選擇您的名字 😊'); return; }
+  if (!sel) { showToast('請先選擇您的名字 😊 Please select your name first'); return; }
   currentUser = sel;
   document.getElementById('headerUser').textContent = sel;
   document.getElementById('orderAdminBtn').style.display = 'inline-block';
@@ -672,7 +677,7 @@ function checkOrderAdminPw() {
     closeModal('modalOrderAdmin');
     enterAdminMode();
   } else {
-    showToast('密碼錯誤 ❌');
+    showToast('密碼錯誤 ❌ Wrong password');
   }
 }
 
@@ -711,7 +716,7 @@ function checkLandingAdminPw() {
     renderAdminNameList();
     openModal('modalNamePanel');
   } else {
-    showToast('密碼錯誤 ❌');
+    showToast('密碼錯誤 ❌ Wrong password');
   }
 }
 
@@ -723,8 +728,8 @@ function renderAdminNameList() {
     html += `<div class="name-list-item">
       <input class="name-edit-input" id="nameEdit_${i}" value="${n}">
       <div style="display:flex;gap:5px;">
-        <button class="btn btn-green btn-sm" onclick="saveName(${i})">儲存</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteName(${i})">刪除</button>
+        <button class="btn btn-green btn-sm" onclick="saveName(${i})">儲存 Save</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteName(${i})">刪除 Delete</button>
       </div>
     </div>`;
   });
@@ -737,14 +742,14 @@ function saveName(i) {
   if (!val) return;
   names[i] = val; saveNames(names);
   populateNameSelect(); renderAdminNameList();
-  showToast('已更新 ✅');
+  showToast('已更新 ✅ Updated');
 }
 
 function deleteName(i) {
   const names = getNames();
   names.splice(i, 1); saveNames(names);
   populateNameSelect(); renderAdminNameList();
-  showToast('已刪除 ✅');
+  showToast('已刪除 ✅ Deleted');
 }
 
 function addName() {
@@ -753,7 +758,7 @@ function addName() {
   const names = getNames(); names.push(val); saveNames(names);
   populateNameSelect(); renderAdminNameList();
   document.getElementById('newNameInput').value = '';
-  showToast('已新增 ✅');
+  showToast('已新增 ✅ Added');
 }
 
 // ========== ORDER ADMIN PANEL ==========
@@ -763,7 +768,7 @@ function renderAdminMeal1Orders() {
   const orders = getMeal1Orders();
   const restaurants = getRestaurants();
   if (Object.keys(orders).length === 0) {
-    el.innerHTML = '<div class="no-data" style="font-size:0.82rem;padding:0.4rem 0;">尚無人登記</div>';
+    el.innerHTML = '<div class="no-data" style="font-size:0.82rem;padding:0.4rem 0;">尚無人登記 — No entries yet</div>';
     return;
   }
   let html = '';
@@ -771,7 +776,7 @@ function renderAdminMeal1Orders() {
     const rname = restaurants[idx] ? restaurants[idx].name : '(已刪除)';
     html += `<div class="name-list-item">
       <span>${name} <span style="color:var(--text-muted);font-size:0.78rem;">— ${rname}</span></span>
-      <button class="btn btn-danger btn-sm" onclick="deleteMeal1Order('${name}')">刪除</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteMeal1Order('${name}')">刪除 Delete</button>
     </div>`;
   });
   el.innerHTML = html;
@@ -782,7 +787,7 @@ function renderAdminMeal2Orders() {
   if (!el) return;
   const orders = getMeal2Orders();
   if (Object.keys(orders).length === 0) {
-    el.innerHTML = '<div class="no-data" style="font-size:0.82rem;padding:0.4rem 0;">尚無人登記</div>';
+    el.innerHTML = '<div class="no-data" style="font-size:0.82rem;padding:0.4rem 0;">尚無人登記 — No entries yet</div>';
     return;
   }
   let html = '';
@@ -792,7 +797,7 @@ function renderAdminMeal2Orders() {
     html += `<div class="name-list-item" style="flex-direction:column;align-items:flex-start;gap:3px;">
       <div style="display:flex;width:100%;justify-content:space-between;align-items:center;">
         <span style="font-weight:500;">${name} <span style="color:var(--primary);font-size:0.78rem;">${total}元</span></span>
-        <button class="btn btn-danger btn-sm" onclick="deleteMeal2Order('${name}')">刪除</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMeal2Order('${name}')">刪除 Delete</button>
       </div>
       <div style="font-size:0.78rem;color:var(--text-muted);">${detail}</div>
       ${order.note ? `<div style="font-size:0.78rem;color:var(--accent);">📝 ${order.note}</div>` : ''}
@@ -855,24 +860,24 @@ function renderRestaurantsGrid() {
 
     const imgHtml = r.imgData
       ? `<img src="${r.imgData}" class="restaurant-img" alt="菜單">`
-      : `<div class="no-img">📷 菜單圖片尚未上傳</div>`;
+      : `<div class="no-img">📷 菜單圖片尚未上傳 No image uploaded</div>`;
     const adminBar = adminMode
       ? `<div class="admin-edit-bar">
-          <button class="btn btn-sm btn-outline" style="width:auto;" onclick="event.stopPropagation();openRestEdit(${i})">✏️ 編輯餐廳</button>
+          <button class="btn btn-sm btn-outline" style="width:auto;" onclick="event.stopPropagation();openRestEdit(${i})">✏️ 編輯餐廳 Edit</button>
          </div>` : '';
 
     card.innerHTML = `
       <div class="restaurant-name">
         <div class="radio-circle"></div>
         ${r.name}
-        ${isFull ? '<span class="full-badge">人數已達上限</span>' : ''}
+        ${isFull ? '<span class="full-badge">人數已達上限 Full</span>' : ''}
       </div>
       ${r.note ? `<div class="restaurant-note">${r.note}</div>` : ''}
       <div class="capacity-bar">
         <div class="capacity-text">
-          已訂 ${count} 人 / 上限 ${cap} 人　
+          已訂 ${count} 人 / 上限 ${cap} 人 (${count}/${cap} seats taken)　
           <span style="color:${remaining===0?'#e74c3c':remaining<=2?'#f39c12':'#27ae60'};font-weight:500;">
-            ${remaining === 0 ? '❌ 已額滿' : `剩餘 ${remaining} 位`}
+            ${remaining === 0 ? '❌ 已額滿 Full' : `剩餘 ${remaining} 位 (${remaining} left)`}
           </span>
         </div>
         <div class="capacity-track">
@@ -893,7 +898,7 @@ function renderRestaurantAdminList() {
   restaurants.forEach((r, i) => {
     html += `<div class="name-list-item">
       <span>${r.name}</span>
-      <button class="btn btn-sm btn-outline" style="width:auto;" onclick="openRestEdit(${i})">✏️ 編輯</button>
+      <button class="btn btn-sm btn-outline" style="width:auto;" onclick="openRestEdit(${i})">✏️ 編輯 Edit</button>
     </div>`;
   });
   el.innerHTML = html;
@@ -906,7 +911,7 @@ function selectRestaurant(idx) {
   const cap = CAPACITIES[idx];
   // Allow if user already selected this, or not full
   if (counts[idx] >= cap && currentSel !== idx) {
-    showToast('此餐廳人數已達上限 ❌');
+    showToast('此餐廳人數已達上限 ❌ This restaurant is full');
     return;
   }
   document.querySelectorAll('.restaurant-card').forEach(c => c.classList.remove('selected'));
@@ -916,13 +921,13 @@ function selectRestaurant(idx) {
 
 function submitMeal1() {
   const selected = document.querySelector('.restaurant-card.selected');
-  if (!selected) { showToast('請先選擇一家餐廳 🍽️'); return; }
+  if (!selected) { showToast('請先選擇一家餐廳 🍽️ Please select a restaurant first'); return; }
   const idx = parseInt(selected.dataset.idx);
   const orders = getMeal1Orders();
   orders[currentUser] = idx; saveMeal1Orders(orders);
   renderMeal1Summary();
   syncToSheet();
-  showToast('✅ 5/2 餐廳選擇已儲存，同步中…');
+  showToast('✅ 5/2 餐廳選擇已儲存，同步中… Saved & syncing…');
 }
 
 function renderMeal1Summary() {
@@ -938,7 +943,7 @@ function renderMeal1Summary() {
   });
   const anyOrders = Object.values(groups).some(g => g.people.length > 0);
   if (!anyOrders) {
-    el.innerHTML = '<div class="summary-box"><div class="no-data">尚無人登記 5/2 午餐</div></div>';
+    el.innerHTML = '<div class="summary-box"><div class="no-data">尚無人登記 5/2 午餐 — No entries yet</div></div>';
     return;
   }
   let html = '<div class="summary-box">';
@@ -964,7 +969,7 @@ function renderMeal1Summary() {
       </div>
       <div class="people-list">`;
     if (g.people.length === 0) {
-      html += `<span style="font-size:0.8rem;color:var(--text-muted);">尚無人選擇</span>`;
+      html += `<span style="font-size:0.8rem;color:var(--text-muted);">尚無人選擇 None yet</span>`;
     } else {
       g.people.forEach(p => { html += `<span class="person-tag">${p}</span>`; });
     }
@@ -1018,7 +1023,7 @@ function changeQty(idx, delta) {
 
 function submitMeal2() {
   const hasOrder = Object.values(qtyMap).some(v => v > 0);
-  if (!hasOrder) { showToast('請先選擇至少一道餐點 🥢'); return; }
+  if (!hasOrder) { showToast('請先選擇至少一道餐點 🥢 Please select at least one item'); return; }
   const note = document.getElementById('meal2Note').value;
   const orders = getMeal2Orders();
   const items = [];
@@ -1032,7 +1037,7 @@ function submitMeal2() {
   saveMeal2Orders(orders);
   renderMeal2Summary();
   syncToSheet();
-  showToast('✅ 5/3 點餐已儲存，同步中…');
+  showToast('✅ 5/3 點餐已儲存，同步中… Saved & syncing…');
 }
 
 function renderMeal2Summary() {
@@ -1040,7 +1045,7 @@ function renderMeal2Summary() {
   if (!el) return;
   const orders = getMeal2Orders();
   if (Object.keys(orders).length === 0) {
-    el.innerHTML = '<div class="summary-box"><div class="no-data">尚無人登記 5/3 午餐</div></div>';
+    el.innerHTML = '<div class="summary-box"><div class="no-data">尚無人登記 5/3 午餐 — No entries yet</div></div>';
     return;
   }
   let html = '';
@@ -1084,7 +1089,7 @@ function saveRestaurant() {
     renderRestaurantsGrid();
     renderRestaurantAdminList();
     closeModal('modalRestEdit');
-    showToast('餐廳資料已更新 ✅');
+    showToast('餐廳資料已更新 ✅ Restaurant updated');
   }
   if (file) {
     const reader = new FileReader();
@@ -1115,7 +1120,7 @@ function exportCSV() {
   a.href = URL.createObjectURL(blob); a.download = '點餐統計.csv';
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
-  showToast('CSV 已下載 ✅');
+  showToast('CSV 已下載 ✅ CSV downloaded');
 }
 
 // ========== MODAL ==========
